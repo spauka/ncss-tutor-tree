@@ -7,7 +7,7 @@ queue()
   .await(loadNCSSTree)
 
 // A list of people's names
-var people = d3.map()
+var names = d3.set();
 // A map of the tutors by group and year
 var groupTutors = d3.map();
 // A map of who has been tutored by who
@@ -36,8 +36,8 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
         group.push(person);
       }
 
-      // Add the person to the list of people
-      people.set(person.name);
+      // Add the person to the set of people
+      names.add(person.name);
     });
   });
 
@@ -78,6 +78,49 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
 
   console.log(tutoredWith);
   console.log(tutoredBy);
+
+  // Create the graph visualization
+
+  // SVG element
+  var svg = d3.select('body').append('svg');
+  
+  // Groups of elements
+  var peopleGroup = svg.append('svg:g')
+    .attr('class', 'people');
+
+  var relationshipsGroup = svg.append('svg:circle')
+    .attr('class', 'relationships');
+
+  updateGraph = function() {
+    // Each person has an group element
+    people = peopleGroup.selectAll('g.person')
+      .data(names.values());
+
+    // People get given a group element when they start NCSS
+    var group = people.enter().append('svg:g')
+      .attr('class', 'person');
+    // ...with a rectangle
+    group.append('svg:rect')
+      .attr('width', 200)
+      .attr('height', 50);
+    // ...and a label for their name
+    group.append('svg:text')
+      .attr('fill', 'white')
+      .attr('dx', 10)
+      .attr('dy', 25);
+
+    // People's elements are positioned
+    people
+      .attr('title', function(name) { return name; })
+      .attr('transform', function(name, i) { return 'translate(200, '+(i*60)+')'; })
+      .each(function(name) {
+        // ...and are labelled with their names
+        d3.select(this).select('text')
+          .text(function(name) { return name; })
+      });
+  }
+
+  updateGraph();
 }
 
 // Determine whether a person's role is a tutor role
