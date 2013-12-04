@@ -85,6 +85,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   });
 
   // Create the graph visualization
+  relFilter = d3.map();
   var personRadius = 20;
 
   // Create a colour set for the graph
@@ -108,6 +109,11 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   var people, rels;
 
   updateGraph = function() {
+    // Filter by relationship type filter
+    var relations = relationships.filter(function(rel) {
+      return relFilter.get(rel.relationship);
+    });
+
     // Each person has an group element
     people = peopleGroup.selectAll('g.person')
       .data(names.values());
@@ -135,7 +141,6 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
       .call(force.drag);
 
     // The bubbles are fit to the text
-    personRadius = 0;
     group.selectAll('text').each(function() {
        var bbox = this.getBBox();
        if (bbox.width > personRadius)
@@ -153,10 +158,12 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
 
     // People have relationships
     rels = relationshipGroup.selectAll('line.relationship')
-      .data(relationships);
+      .data(relations);
 
     // Relationships are given lines
     rels.enter().append('svg:line')
+
+    rels.exit().remove();
 
     // Relationships are classed, coloured and labelled
     rels
@@ -168,7 +175,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
     // Set the force layout data
     force
       .nodes(names.values())
-      .links(relationships)
+      .links(relations)
       .start();
   }
 
@@ -195,7 +202,6 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
 
   // Get the set of all relationship types
   var relTypes = d3.set(relationships.map(function(rel) { return rel.relationship}))
-  console.log(relTypes);
 
   // Create a legend
   var legend = d3.select('body').append('ul');
@@ -209,9 +215,18 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   // Style entries
   entries.enter().append('li')
     .each(function(relType) {
+      // Checkbox for hiding/showing relationships in the graph
+      d3.select(this).append('input')
+        .attr('type', 'checkbox')
+        .on('click', function(relType) {
+          relFilter.set(relType, this.checked);
+          updateGraph();
+        })
+      // Colour key for identifying the relationship
       d3.select(this).append('span')
         .attr('class', 'colour-key')
         .style('background', relationshipColour(relType));
+      // Name of the type of the relationship
       d3.select(this).append('span')
         .text(function(relType) { return relType; });
     })
