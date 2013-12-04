@@ -139,7 +139,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
     group.selectAll('text').each(function() {
        var bbox = this.getBBox();
        if (bbox.width > personRadius)
-         personRadius = bbox.width/2 + 15;
+         personRadius = bbox.width/2 + 20;
     });
     // Update the link size to the bubble size
     force.linkDistance(personRadius*2 + 30);

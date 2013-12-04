@@ -3,6 +3,9 @@
 }
 
 .person > text {
+  font-family: 'Wellfleet', sans-serif;
+  font-weight: bold;
+  font-size: 0.8em;
   cursor: default;
 }
 
