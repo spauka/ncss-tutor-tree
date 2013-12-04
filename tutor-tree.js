@@ -85,6 +85,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   });
 
   // Create the graph visualization
+  var personRadius = 20;
 
   // SVG element
   var svg = d3.select('body').append('svg');
@@ -104,17 +105,16 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
       .data(names.values());
 
     // People get given a group element when they start NCSS
-    var group = people.enter().append('svg:g')
+    group = people.enter().append('svg:g')
       .attr('class', 'person');
-    // ...with a rectangle
-    group.append('svg:rect')
-      .attr('width', 200)
-      .attr('height', 50);
+    // ...with a circle
+    group.append('svg:circle')
+      .attr('r', personRadius)
     // ...and a label for their name
     group.append('svg:text')
       .attr('fill', 'white')
-      .attr('dx', 10)
-      .attr('dy', 25);
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'middle')
 
     // People's elements are positioned
     people
@@ -122,10 +122,26 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
       .each(function(person) {
         // ...and are labelled with their names
         d3.select(this).select('text')
-          .text(function(person) { return person.name; })
+          .text(function(person) { return person.name; });
       })
       .call(force.drag);
 
+    // The bubbles are fit to the text
+    personRadius = 0;
+    group.selectAll('text').each(function() {
+       var bbox = this.getBBox();
+       if (bbox.width > personRadius)
+         personRadius = bbox.width/2 + 15;
+    });
+    // Update the link size to the bubble size
+    force.linkDistance(personRadius*2 + 30);
+
+    // People's circles are resized
+    people
+      .each(function(person) {
+        d3.select(this).select('circle')
+          .attr('r', personRadius);
+      });
 
     // People have relationships
     rels = relationshipGroup.selectAll('line.relationship')
@@ -151,8 +167,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   // Add force layout to the graph
   var element = document.getElementsByTagName('body')[0];
   var force = d3.layout.force()
-    .charge(-120)
-    .linkDistance(60)
+    .charge(-400)
     .size([element.offsetWidth, element.offsetHeight]);
 
   // Update tutor/relationships positions
