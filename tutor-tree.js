@@ -57,8 +57,8 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
         if (fellowTutors)
           fellowTutors.forEach(function(tutor) {
             relationships.push({
-              source: person.name,
-              target: tutor.name,
+              source: names.get(person.name),
+              target: names.get(tutor.name),
               relationship: 'tutored with',
               year: year,
             });
@@ -74,8 +74,8 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
         if (tutors)
           tutors.forEach(function(tutor) {
             relationships.push({
-              source: person.name,
-              target: tutor.name,
+              source: names.get(person.name),
+              target: names.get(tutor.name),
               relationship: 'tutored by',
               year: year,
             });
@@ -119,31 +119,53 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
     // People's elements are positioned
     people
       .attr('title', function(person) { return person.name; })
-      .attr('transform', function(person, i) { return 'translate(200, '+(i*60)+')'; })
       .each(function(person) {
         // ...and are labelled with their names
         d3.select(this).select('text')
           .text(function(person) { return person.name; })
-      });
+      })
+      .call(force.drag);
 
 
     // People have relationships
-    rels = relationshipGroup.selectAll('g.relationship')
+    rels = relationshipGroup.selectAll('line.relationship')
       .data(relationships);
 
-    rels.enter().append('svg:g')
-      .attr('class', 'relationship');
+    // Relationships are given lines
+    rels.enter().append('svg:line')
+      .attr('stroke', 'white');
+
+    // Relationships are classed and labelled
+    rels
+      .attr('class', function(rel) { return 'relationship ' + rel.relationship; })
+      .attr('source', function(rel) { return rel.source.name; })
+      .attr('target', function(rel) { return rel.target.name; })
+  
+    // Set the force layout data
+    force
+      .nodes(names.values())
+      .links(relationships)
+      .start();
   }
 
+  // Add force layout to the graph
+  var element = document.getElementsByTagName('body')[0];
+  var force = d3.layout.force()
+    .charge(-120)
+    .linkDistance(60)
+    .size([element.offsetWidth, element.offsetHeight]);
 
-    // Each tutoring relationship gets a path when commenced
-    fellowTutorsByYear.enter().append('svg:path')
-      .attr('class', 'fellow-tutor');
+  // Update tutor/relationships positions
+  force.on('tick', function() {
+    rels
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
 
-    // Each tutoring relationship is labelled
-    fellowTutorsByYear
-      .attr('name', function(tutor) { return tutor.name } );
-  }
+    people
+      .attr("transform", function(d) { return 'translate('  + d.x + ', ' + d.y + ')'; })
+   });
 
   updateGraph();
 }
