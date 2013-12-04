@@ -123,6 +123,7 @@ function loadNCSSTree(error) {
     });
   }
   function relsTransform() {
+    rels.attr('xxxx', function(d) { return JSON.stringify(d.source.layout) } );
     rels
       .attr("x1", function(d) { return x(xScale(d.source.layout.x)); })
       .attr("y1", function(d) { return y(yScale(d.source.layout.y)); })
@@ -157,9 +158,14 @@ function loadNCSSTree(error) {
       return relFilter.get(rel.relationship);
     });
 
+    // Filter people by relations
+    var peeps = names.values().filter(function(person) {
+      return relations.filter(function(rel) { return  rel.source.name == person.name || rel.target.name == person.name; }).length > 0;
+    });
+
     // Each person has an group element
     people = peopleGroup.selectAll('g.person')
-      .data(names.values());
+      .data(peeps);
 
     // People get given a group element when they start NCSS
     group = people.enter().append('svg:g')
@@ -196,6 +202,8 @@ function loadNCSSTree(error) {
           .attr('r', personRadius);
       });
 
+    people.exit().remove();
+
     // People have relationships
     rels = relationshipGroup.selectAll('line.relationship')
       .data(relations);
@@ -216,8 +224,8 @@ function loadNCSSTree(error) {
     var graph = new dagre.Digraph();
 
     // Add the nodes
-    names.keys().forEach(function(name) {
-      graph.addNode(name, {width: personRadius*2, height: personRadius*2});
+    peeps.forEach(function(person) {
+      graph.addNode(person.name, {width: personRadius*2, height: personRadius*2});
     })
 
     // Add the edges
@@ -231,17 +239,21 @@ function loadNCSSTree(error) {
       .rankDir("TB")
       .run(graph);
 
-    var maxx = 0, maxy = 0;
+    var maxx = 0, maxy = 0, minx = Infinity, miny = Infinity;
     layout.eachNode(function(name, layout) {
       names.get(name).layout = layout;
 
       maxx = Math.max(maxx, layout.x);
       maxy = Math.max(maxy, layout.y);
+      minx = Math.min(minx, layout.x);
+      miny = Math.min(miny, layout.y);
     });
 
     // Normalize the node positions
-    xScale.domain([0, maxy]);
-    yScale.domain([0, maxy]);
+    zoom.translate([0,0]);
+    zoom.size(1);
+    xScale.domain([minx-personRadius, maxx+personRadius]);
+    yScale.domain([miny-personRadius, maxy+personRadius]);
 
     // Apply the layout
     transformGraph();
