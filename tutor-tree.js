@@ -85,7 +85,9 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   });
 
   // Create the graph visualization
-  relFilter = d3.map();
+  var relFilter = d3.map();
+  relFilter.set('tutored with', true);
+
   var personRadius = 20;
 
   // Create a colour set for the graph
@@ -221,14 +223,17 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
       // Checkbox for hiding/showing relationships in the graph
       d3.select(this).append('input')
         .attr('type', 'checkbox')
+        .property('checked', function(d) { return relFilter.get(d) || false; })
         .on('click', function(relType) {
           relFilter.set(relType, this.checked);
           updateGraph();
         })
+
       // Colour key for identifying the relationship
       d3.select(this).append('span')
         .attr('class', 'colour-key')
         .style('background', relationshipColour(relType));
+
       // Name of the type of the relationship
       d3.select(this).append('span')
         .text(function(relType) { return relType; });
