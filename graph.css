@@ -38,6 +38,21 @@ html, body {
 
 .relationship {
   stroke-width: 5px;
+  stroke-dasharray: 15, 15;
+  
+  animation: relationshipDirection 2s linear infinite;
+  -webkit-animation: relationshipDirection 2s linear infinite;
+}
+
+/* Stroke animation */
+@keyframes relationshipDirection {
+  from {stroke-dashoffset: 0;}
+  to {stroke-dashoffset: 30;}
+}
+
+@-webkit-keyframes relationshipDirection {
+  from {stroke-dashoffset: 0;}
+  to {stroke-dashoffset: 30;}
 }
 
 /* Controls Styling */
