@@ -191,6 +191,30 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
    });
 
   updateGraph();
+
+
+  // Get the set of all relationship types
+  var relTypes = d3.set(relationships.map(function(rel) { return rel.relationship}))
+  console.log(relTypes);
+
+  // Create a legend
+  var legend = d3.select('body').append('ul');
+  legend
+    .attr('class', 'legend');
+
+  // Add the entries
+  var entries = legend.selectAll('li')
+    .data(relTypes.values());
+  
+  // Style entries
+  entries.enter().append('li')
+    .each(function(relType) {
+      d3.select(this).append('span')
+        .attr('class', 'colour-key')
+        .style('background', relationshipColour(relType));
+      d3.select(this).append('span')
+        .text(function(relType) { return relType; });
+    })
 }
 
 // Determine whether a person's role is a tutor role
