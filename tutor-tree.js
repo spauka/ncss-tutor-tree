@@ -7,13 +7,11 @@ queue()
   .await(loadNCSSTree)
 
 // A list of people's names
-var names = d3.set();
+var names = d3.map();
 // A map of the tutors by group and year
 var groupTutors = d3.map();
-// A map of who has been tutored by who
-var tutoredBy = d3.map();
-// A map of who has tutored in the same group
-var tutoredWith = d3.map();
+// Relationships list
+var relationships = [];
 
 function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   var trees = [tree2009, tree2010, tree2011];
@@ -39,7 +37,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
       }
 
       // Add the person to the set of people
-      names.add(person.name);
+      names.set(person.name, {name: person.name});
     });
   });
 
@@ -52,36 +50,39 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
     tree.forEach(function(person) {
       // Build the tutoredWith map
       if (isTutor(person)) {
-        // Get the list of people this person tutored with
-        var tutoredWithPerson = tutoredWith.get(person.name);
-
-        // If the list is undefined create a new one
-        if (tutoredWithPerson === undefined)
-          tutoredWithPerson = tutoredWith.set(person.name, d3.map());
-
-        // Add this year's list of tutors to the people tutored with
+        // Get the tutors this person tutored with
         var fellowTutors = groupTutors.get(year).get(person.group);
-        tutoredWithPerson.set(year, fellowTutors);
+
+        // Add relationships
+        if (fellowTutors)
+          fellowTutors.forEach(function(tutor) {
+            relationships.push({
+              source: person.name,
+              target: tutor.name,
+              relationship: 'tutored with',
+              year: year,
+            });
+          });
       }
 
       // Build the tutoredBy map
       else if (person.role === "student") {
-        // Get the list of people this person was tutored by
-        var personTutoredBy = tutoredBy.get(person.name);
-
-        // If the list is undefined create a new one
-        if (personTutoredBy === undefined)
-          personTutoredBy = tutoredBy.set(person.name, d3.map());
-
-        // Add this year's list of tutors to the tutors tutored by
+        // Get the tutors who tutored this person
         var tutors = groupTutors.get(year).get(person.group);
-        personTutoredBy.set(year, tutors);
+
+        // Add relationships
+        if (tutors)
+          tutors.forEach(function(tutor) {
+            relationships.push({
+              source: person.name,
+              target: tutor.name,
+              relationship: 'tutored by',
+              year: year,
+            });
+          });
       }
     });
   });
-
-  console.log(tutoredWith);
-  console.log(tutoredBy);
 
   // Create the graph visualization
 
@@ -92,9 +93,14 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   var peopleGroup = svg.append('svg:g')
     .attr('class', 'people');
 
+  var relationshipGroup = svg.append('svg:g')
+    .attr('class', 'relationships');
+
+  var people, rels;
+
   updateGraph = function() {
     // Each person has an group element
-    var people = peopleGroup.selectAll('g.person')
+    people = peopleGroup.selectAll('g.person')
       .data(names.values());
 
     // People get given a group element when they start NCSS
@@ -112,31 +118,23 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
 
     // People's elements are positioned
     people
-      .attr('title', function(name) { return name; })
-      .attr('transform', function(name, i) { return 'translate(200, '+(i*60)+')'; })
-      .each(function(name) {
+      .attr('title', function(person) { return person.name; })
+      .attr('transform', function(person, i) { return 'translate(200, '+(i*60)+')'; })
+      .each(function(person) {
         // ...and are labelled with their names
         d3.select(this).select('text')
-          .text(function(name) { return name; })
+          .text(function(person) { return person.name; })
       });
 
 
-    // People tutor with a set of people each year
-    var fellowTutors = people.selectAll('g.tutored-with')
-      .data(function(name) { 
-        var tutorsByYear = tutoredWith.get(name);
-        if (tutorsByYear)
-          return tutorsByYear.values();
-        else
-          return [];
-      })
+    // People have relationships
+    rels = relationshipGroup.selectAll('g.relationship')
+      .data(relationships);
 
-    fellowTutors.enter().append('svg:g')
-      .attr('class', 'tutored-with');
+    rels.enter().append('svg:g')
+      .attr('class', 'relationship');
+  }
 
-    // Each year has a set of fellow tutors
-    var fellowTutorsByYear = fellowTutors.selectAll('path.fellow-tutor')
-      .data(function(tutors) { return tutors; })
 
     // Each tutoring relationship gets a path when commenced
     fellowTutorsByYear.enter().append('svg:path')
