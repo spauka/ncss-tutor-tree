@@ -85,6 +85,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   });
 
   // Create the graph visualization
+  var relationshipColour = d3.scale.category10();
   var personRadius = 20;
 
   // SVG element
@@ -149,11 +150,11 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
 
     // Relationships are given lines
     rels.enter().append('svg:line')
-      .attr('stroke', 'white');
 
-    // Relationships are classed and labelled
+    // Relationships are classed, coloured and labelled
     rels
       .attr('class', function(rel) { return 'relationship ' + rel.relationship; })
+      .attr('stroke', function(rel) { return relationshipColour(rel.relationship); })
       .attr('source', function(rel) { return rel.source.name; })
       .attr('target', function(rel) { return rel.target.name; })
   
