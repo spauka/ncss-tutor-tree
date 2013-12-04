@@ -3,18 +3,18 @@ group,name,role
 ,Ben Taylor,tutor
 ,Chris Neugebauer,tutor
 ,David Claridge,tutor
-,Dominick Ng,tutor
+3,Dominick Ng,tutor
 ,Gareth Robinson,tutor
 ,Gary Reynolds,tutor
 5,George Karpenkov,student
-,Georgina Wilcox,tutor
+3,Georgina Wilcox,tutor
 2,Glen Pink,tutor
-,Jackson Gatenby,student
+3,Jackson Gatenby,student
 ,James Constable,tutor
 ,Jeshua Morrissey,student
 ,John Jiang,tutor
 ,Jonathan Kummerfeld,tutor
-,Joseph Wang,student
+3,Joseph Wang,student
 5,Kathryn Czornij,student
 ,Kim Upton,tutor
 2,Laura Ingram,tutor
@@ -28,7 +28,7 @@ group,name,role
 ,Sam Thorogood,tutor
 ,Sasha Bermeister,student
 5,Stephen Merity,student
-,Steven Sommer,tutor
+3,Steven Sommer,tutor
 ,Tian Pu,student
-,Tim Dawborn,tutor
-,Will Cannings,tutor
+3,Tim Dawborn,tutor
+3,Will Cannings,group leader
