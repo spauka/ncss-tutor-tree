@@ -6,6 +6,8 @@ queue()
 //  .defer(d3.csv, 'NCSS2013.csv')
   .await(loadNCSSTree)
 
+// A list of people's names
+var people = d3.map()
 // A map of the tutors by group and year
 var groupTutors = d3.map();
 // A map of who has been tutored by who
@@ -33,6 +35,9 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
         // Add the person to the group
         group.push(person);
       }
+
+      // Add the person to the list of people
+      people.set(person.name);
     });
   });
 
