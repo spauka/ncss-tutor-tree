@@ -22,13 +22,13 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
     groupTutors.set(year, d3.map());
 
     tree.forEach(function(person) {
-      if (person.role === "tutor") {
+      if (isTutor(person)) {
         // Get the group of tutors this person is in
         var group = groupTutors.get(year).get(person.group);
 
         // Construct a new group if it doesn't exist yet
         if (group === undefined)
-          group = groupTutors.get(year).set(person.group, [])
+          group = groupTutors.get(year).set(person.group, []);
 
         // Add the person to the group
         group.push(person);
@@ -39,5 +39,31 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   console.log(groupTutors);
 
   // Build the tutoredBy and tutoredWith maps
+  trees.forEach(function(tree, year) {
+    tree.forEach(function(person) {
+      // Build the tutoredWith map
+      if (isTutor(person)) {
+        // Get the list of people this person tutored with
+        var tutoredWithPerson = tutoredWith.get(person.name);
 
+        // If the list is undefined create a new one
+        if (tutoredWithPerson === undefined)
+          tutoredWithPerson = tutoredWith.set(person.name, d3.map());
+
+        // Add this year's list of tutors to the people tutored with
+        var fellowTutors = groupTutors.get(year).get(person.group);
+        tutoredWithPerson.set(year, fellowTutors);
+      }
+      // Build the tutoredBy map
+      else if (person.role === "student") {
+      }
+    });
+  });
+
+  console.log(tutoredWith);
+}
+
+// Determine whether a person's role is a tutor role
+function isTutor(person) {
+  return person.role === "tutor" || person.role === "industry tutor" || person.role === "group leader";
 }
