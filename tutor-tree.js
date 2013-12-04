@@ -20,6 +20,8 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   
   // Build the groupTutors map
   trees.forEach(function(tree, year) {
+    year += 2009;
+
     // Add a map for each year's groups
     groupTutors.set(year, d3.map());
 
@@ -45,6 +47,8 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
 
   // Build the tutoredBy and tutoredWith maps
   trees.forEach(function(tree, year) {
+    year += 2009;
+
     tree.forEach(function(person) {
       // Build the tutoredWith map
       if (isTutor(person)) {
@@ -88,12 +92,9 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   var peopleGroup = svg.append('svg:g')
     .attr('class', 'people');
 
-  var relationshipsGroup = svg.append('svg:circle')
-    .attr('class', 'relationships');
-
   updateGraph = function() {
     // Each person has an group element
-    people = peopleGroup.selectAll('g.person')
+    var people = peopleGroup.selectAll('g.person')
       .data(names.values());
 
     // People get given a group element when they start NCSS
@@ -118,6 +119,32 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
         d3.select(this).select('text')
           .text(function(name) { return name; })
       });
+
+
+    // People tutor with a set of people each year
+    var fellowTutors = people.selectAll('g.tutored-with')
+      .data(function(name) { 
+        var tutorsByYear = tutoredWith.get(name);
+        if (tutorsByYear)
+          return tutorsByYear.values();
+        else
+          return [];
+      })
+
+    fellowTutors.enter().append('svg:g')
+      .attr('class', 'tutored-with');
+
+    // Each year has a set of fellow tutors
+    var fellowTutorsByYear = fellowTutors.selectAll('path.fellow-tutor')
+      .data(function(tutors) { return tutors; })
+
+    // Each tutoring relationship gets a path when commenced
+    fellowTutorsByYear.enter().append('svg:path')
+      .attr('class', 'fellow-tutor');
+
+    // Each tutoring relationship is labelled
+    fellowTutorsByYear
+      .attr('name', function(tutor) { return tutor.name } );
   }
 
   updateGraph();
