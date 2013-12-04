@@ -92,11 +92,11 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   var svg = d3.select('body').append('svg');
   
   // Groups of elements
-  var peopleGroup = svg.append('svg:g')
-    .attr('class', 'people');
-
   var relationshipGroup = svg.append('svg:g')
     .attr('class', 'relationships');
+
+  var peopleGroup = svg.append('svg:g')
+    .attr('class', 'people');
 
   var people, rels;
 
