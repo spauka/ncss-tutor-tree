@@ -2,8 +2,9 @@ queue()
   .defer(d3.csv, 'NCSS2009.csv')
   .defer(d3.csv, 'NCSS2010.csv')
   .defer(d3.csv, 'NCSS2011.csv')
-//  .defer(d3.csv, 'NCSS2012.csv')
-//  .defer(d3.csv, 'NCSS2013.csv')
+  .defer(d3.csv, 'NCSS2012.csv')
+  .defer(d3.csv, 'NCSS2013.csv')
+  .defer(d3.csv, 'NCSS2014.csv')
   .await(loadNCSSTree)
 
 // A list of people's names
@@ -13,8 +14,11 @@ var groupTutors = d3.map();
 // Relationships list
 var relationships = [];
 
-function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
-  var trees = [tree2009, tree2010, tree2011];
+function loadNCSSTree(error) {
+  // Take in all the trees from the arguments
+  var trees = [];
+  for (var i = 1; i < arguments.length; i++)
+    trees.push(arguments[i]);
   
   // Build the groupTutors map
   trees.forEach(function(tree, year) {
