@@ -1,3 +1,30 @@
+/* Page Layout */
+html, body {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+.graph {
+  display: block;
+  width: 100%;
+  height: 80%;
+}
+
+.graph > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.controls {
+  width: 100%;
+  height: 20%;
+
+  background: #EEE;
+  color: #644;
+}
+
+/* Graph styling */
 .person > circle {
   fill: hsla(168, 50%, 50%, 0.6);
 }
@@ -13,8 +40,17 @@
   stroke-width: 5px;
 }
 
-.legend {
+/* Controls Styling */
+.controls {
   font-family: 'Wellfleet', sans-serif;
+}
+
+.legend-section {
+  padding: 10px;
+}
+
+.legend-section > h2 {
+  margin-top: 0px;
 }
 
 .legend .colour-key,

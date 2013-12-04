@@ -97,7 +97,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
     .range(colours);
 
   // SVG element
-  var svg = d3.select('body').append('svg');
+  var svg = d3.select('.graph').append('svg');
   
   // Groups of elements
   var relationshipGroup = svg.append('svg:g')
@@ -180,10 +180,13 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   }
 
   // Add force layout to the graph
-  var element = document.getElementsByTagName('body')[0];
+  var element = d3.select('.graph')[0][0];
   var force = d3.layout.force()
     .charge(-400)
     .size([element.offsetWidth, element.offsetHeight]);
+  svg
+    .attr('width', element.offsetWidth)
+    .attr('height', element.offsetHeight);
 
   // Update tutor/relationships positions
   force.on('tick', function() {
@@ -204,7 +207,7 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   var relTypes = d3.set(relationships.map(function(rel) { return rel.relationship}))
 
   // Create a legend
-  var legend = d3.select('body').append('ul');
+  var legend = d3.select('.legend-section').append('ul');
   legend
     .attr('class', 'legend');
 
