@@ -1,4 +1,6 @@
 queue()
+  .defer(d3.csv, 'NCSS2007.csv')
+  .defer(d3.csv, 'NCSS2008.csv')
   .defer(d3.csv, 'NCSS2009.csv')
   .defer(d3.csv, 'NCSS2010.csv')
   .defer(d3.csv, 'NCSS2011.csv')
@@ -19,7 +21,7 @@ function loadNCSSTree(error) {
   var trees = [];
   for (var i = 1; i < arguments.length; i++)
     trees.push(arguments[i]);
-  
+
   // Build the groupTutors map
   trees.forEach(function(tree, year) {
     year += 2009;
@@ -104,7 +106,7 @@ function loadNCSSTree(error) {
 
   // SVG element
   var svg = d3.select('.graph').append('svg');
-  
+
   // Scaling
   x = d3.scale.linear()
     .range([0, svg.property('offsetWidth')]);
@@ -219,8 +221,8 @@ function loadNCSSTree(error) {
       .attr('stroke', function(rel) { return relationshipColour(rel.relationship); })
       .attr('source', function(rel) { return rel.source.name; })
       .attr('target', function(rel) { return rel.target.name; })
-      
-    // Layout the graph 
+
+    // Layout the graph
     var graph = new dagre.Digraph();
 
     // Add the nodes
@@ -272,7 +274,7 @@ function loadNCSSTree(error) {
   // Add the entries
   var entries = legend.selectAll('li')
     .data(relTypes.values());
-  
+
   // Style entries
   entries.enter().append('li')
     .each(function(relType) {
