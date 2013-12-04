@@ -54,13 +54,25 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
         var fellowTutors = groupTutors.get(year).get(person.group);
         tutoredWithPerson.set(year, fellowTutors);
       }
+
       // Build the tutoredBy map
       else if (person.role === "student") {
+        // Get the list of people this person was tutored by
+        var personTutoredBy = tutoredBy.get(person.name);
+
+        // If the list is undefined create a new one
+        if (personTutoredBy === undefined)
+          personTutoredBy = tutoredBy.set(person.name, d3.map());
+
+        // Add this year's list of tutors to the tutors tutored by
+        var tutors = groupTutors.get(year).get(person.group);
+        personTutoredBy.set(year, tutors);
       }
     });
   });
 
   console.log(tutoredWith);
+  console.log(tutoredBy);
 }
 
 // Determine whether a person's role is a tutor role
