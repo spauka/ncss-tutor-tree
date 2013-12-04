@@ -90,7 +90,7 @@ function loadNCSSTree(error) {
 
   // Create the graph visualization
   var relFilter = d3.map();
-  relFilter.set('tutored with', true);
+  relFilter.set('tutored by', true);
 
   var personRadius = 20;
 
