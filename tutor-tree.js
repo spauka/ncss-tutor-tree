@@ -30,7 +30,7 @@ function loadNCSSTree(error) {
     groupTutors.set(year, d3.map());
 
     tree.forEach(function(person) {
-      if (isTutor(person)) {
+      if (isTutor(person) && person.group) {
         // Get the group of tutors this person is in
         var group = groupTutors.get(year).get(person.group);
 
