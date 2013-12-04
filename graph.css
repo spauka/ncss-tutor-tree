@@ -60,6 +60,10 @@ html, body {
   font-family: 'Wellfleet', sans-serif;
 }
 
+.controls > h1 {
+  margin-top: 0px;
+}
+
 .legend-section {
   padding: 10px;
 }
