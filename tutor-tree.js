@@ -105,11 +105,48 @@ function loadNCSSTree(error) {
   // SVG element
   var svg = d3.select('.graph').append('svg');
   
+  // Scaling
+  x = d3.scale.linear()
+    .range([0, svg.property('offsetWidth')]);
+  xScale = d3.scale.linear()
+    .range([0, 1]);
+
+  y = d3.scale.linear()
+    .range([0, svg.property('offsetHeight')]);
+  yScale = d3.scale.linear()
+    .range([0, 1]);
+
+  // Zoom behaviour
+  function peopleTransform(person) {
+    people.attr("transform", function(person) {
+      return "translate(" + x(xScale(person.layout.x)) + "," + y(yScale(person.layout.y)) + ")";
+    });
+  }
+  function relsTransform() {
+    rels
+      .attr("x1", function(d) { return x(xScale(d.source.layout.x)); })
+      .attr("y1", function(d) { return y(yScale(d.source.layout.y)); })
+      .attr("x2", function(d) { return x(xScale(d.target.layout.x)); })
+      .attr("y2", function(d) { return y(yScale(d.target.layout.y)); });
+  }
+  function transformGraph() {
+    peopleTransform();
+    relsTransform();
+  }
+  var zoom = d3.behavior.zoom()
+    .x(x)
+    .y(y)
+    .on("zoom", transformGraph)
+
+  svg.call(zoom);
+
   // Groups of elements
-  var relationshipGroup = svg.append('svg:g')
+  var container = svg.append('svg:g')
+
+  var relationshipGroup = container.append('svg:g')
     .attr('class', 'relationships');
 
-  var peopleGroup = svg.append('svg:g')
+  var peopleGroup = container.append('svg:g')
     .attr('class', 'people');
 
   var people, rels;
@@ -143,8 +180,7 @@ function loadNCSSTree(error) {
         // ...and are labelled with their names
         d3.select(this).select('text')
           .text(function(person) { return person.name; });
-      })
-      .call(force.drag);
+      });
 
     // The bubbles are fit to the text
     group.selectAll('text').each(function() {
@@ -152,8 +188,6 @@ function loadNCSSTree(error) {
        if (bbox.width > personRadius)
          personRadius = bbox.width/2 + 20;
     });
-    // Update the link size to the bubble size
-    force.linkDistance(personRadius*2 + 30);
 
     // People's circles are resized
     people
@@ -177,37 +211,43 @@ function loadNCSSTree(error) {
       .attr('stroke', function(rel) { return relationshipColour(rel.relationship); })
       .attr('source', function(rel) { return rel.source.name; })
       .attr('target', function(rel) { return rel.target.name; })
-  
-    // Set the force layout data
-    force
-      .nodes(names.values())
-      .links(relations)
-      .start();
+      
+    // Layout the graph 
+    var graph = new dagre.Digraph();
+
+    // Add the nodes
+    names.keys().forEach(function(name) {
+      graph.addNode(name, {width: personRadius*2, height: personRadius*2});
+    })
+
+    // Add the edges
+    relations.forEach(function(rel) {
+      graph.addEdge(null, rel.source.name, rel.target.name);
+    });
+
+    // Calculate the layout
+    var layout = dagre.layout()
+      .nodeSep(personRadius*2)
+      .rankDir("TB")
+      .run(graph);
+
+    var maxx = 0, maxy = 0;
+    layout.eachNode(function(name, layout) {
+      names.get(name).layout = layout;
+
+      maxx = Math.max(maxx, layout.x);
+      maxy = Math.max(maxy, layout.y);
+    });
+
+    // Normalize the node positions
+    xScale.domain([0, maxy]);
+    yScale.domain([0, maxy]);
+
+    // Apply the layout
+    transformGraph();
   }
 
-  // Add force layout to the graph
-  var element = d3.select('.graph')[0][0];
-  var force = d3.layout.force()
-    .charge(-400)
-    .size([element.offsetWidth, element.offsetHeight]);
-  svg
-    .attr('width', element.offsetWidth)
-    .attr('height', element.offsetHeight);
-
-  // Update tutor/relationships positions
-  force.on('tick', function() {
-    rels
-      .attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
-
-    people
-      .attr("transform", function(d) { return 'translate('  + d.x + ', ' + d.y + ')'; })
-   });
-
   updateGraph();
-
 
   // Get the set of all relationship types
   var relTypes = d3.set(relationships.map(function(rel) { return rel.relationship}))
