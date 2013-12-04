@@ -5,3 +5,7 @@
 .person > text {
   cursor: default;
 }
+
+.relationship {
+  stroke-width: 5px;
+}

@@ -85,8 +85,15 @@ function loadNCSSTree(error, tree2009, tree2010, tree2011, tree2012, tree2013) {
   });
 
   // Create the graph visualization
-  var relationshipColour = d3.scale.category10();
   var personRadius = 20;
+
+  // Create a colour set for the graph
+  colours = []
+  for (var hue = 0; hue < 360; hue += 50)
+    colours.push('hsla(' + hue + ', 60%, 70%, 0.8)');
+
+  var relationshipColour = d3.scale.ordinal()
+    .range(colours);
 
   // SVG element
   var svg = d3.select('body').append('svg');
