@@ -8,7 +8,6 @@ group,name,role
 ,David Blaikie,tutor
 2,Dominic Balasuriya,tutor
 ,Dominick Ng,tutor
-5,Emma Fitzgerald,tutor
 ,Erin Jamieson,tutor
 ,Georgina Wilcox,tutor
 ,Giles Gardam,tutor
@@ -26,7 +25,7 @@ group,name,role
 ,Nicky Ringland,tutor
 5,Peter Ward,student
 ,Sam Tardif,tutor
-,Sam Thorogood,tutor
+5,Sam Thorogood,group leader
 5,Sasha Bermeister,student
 ,Sophie Liang,tutor
 1,Stephen Merity,tutor
