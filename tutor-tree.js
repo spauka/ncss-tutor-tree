@@ -217,10 +217,23 @@ function loadNCSSTree(error) {
 
     // Relationships are classed, coloured and labelled
     rels
-      .attr('class', function(rel) { return 'relationship ' + rel.relationship; })
+      .attr('class', function(rel) { return 'relationship ' + rel.relationship + ' source-' + rel.source.name.replace(' ', '-') + ' target-' + rel.target.name.replace(' ', '-'); })
       .attr('stroke', function(rel) { return relationshipColour(rel.relationship); })
       .attr('source', function(rel) { return rel.source.name; })
       .attr('target', function(rel) { return rel.target.name; })
+
+    // Add hover highlighting of relationships
+    people.on('mouseover', function(person) {
+      svg.selectAll('.relationship.source-'+person.name.replace(' ', '-'))
+        .attr('stroke', relationshipColour('source'));
+      svg.selectAll('.relationship.target-'+person.name.replace(' ', '-'))
+        .attr('stroke', relationshipColour('target'));
+    });
+
+    people.on('mouseout', function() {
+      rels
+        .attr('stroke', function(rel) { return relationshipColour(rel.relationship); });
+    })
 
     // Layout the graph
     var graph = new dagre.Digraph();
