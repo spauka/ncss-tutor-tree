@@ -13,7 +13,7 @@ group,name,role
 ,Giles Gardam,tutor
 5,Greg Darke,tutor
 5,Jackson Gatenby,student
-,James Constable,tutor
+3,James Constable,tutor
 ,Joel Nothman,tutor
 ,Jonathan Kummerfeld,tutor
 2,Katie Bell,group leader
@@ -27,6 +27,7 @@ group,name,role
 ,Sam Tardif,tutor
 5,Sam Thorogood,group leader
 5,Sasha Bermeister,student
+3,Sebastian Pauka,student
 ,Sophie Liang,tutor
 1,Stephen Merity,tutor
 4,Suzie Howlett,tutor
